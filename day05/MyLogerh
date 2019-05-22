@@ -1,0 +1,94 @@
+#ifndef __MYLOGER_H__
+#define __MYLOGER_H__
+#include <log4cpp/Category.hh>
+#include <log4cpp/Priority.hh>
+#include <log4cpp/OstreamAppender.hh>
+#include <log4cpp/RollingFileAppender.hh>
+#include <log4cpp/PatternLayout.hh>
+#include <iostream>
+#include <sstream>
+
+#define GET_FNAME_LINE(ss,msg) \
+    ss << "< " << __FILE__ << " , "<< __FUNCTION__ << " , " << __LINE__ << "> : " << msg;
+
+
+using namespace std;
+using namespace log4cpp;
+
+class MyLoger{
+
+public:
+   static MyLoger* getInstance(){
+       if(nullptr == myloger){
+            myloger = new MyLoger();
+       }  
+        return myloger;
+    }
+    Category& logInit();
+    void warn(string,Category&);
+    void error(string,Category&);
+    void info(string,Category&);
+    void debug(string,Category&);
+    void destroy(){
+        Category::shutdown();
+    }
+
+    void MyLogerDestroy(){
+        if(myloger){
+            delete myloger;
+        }
+    }
+
+private:
+    MyLoger(){
+
+    }
+    ~MyLoger(){
+
+    }
+
+private:
+    static MyLoger * myloger;
+};
+
+MyLoger * MyLoger::myloger = nullptr;
+
+Category& MyLoger::logInit(){
+    Category& root = Category::getRoot().getInstance("info");
+
+    PatternLayout * pLayout = new PatternLayout();
+    pLayout->setConversionPattern("%d : %p %c %x : %m %n");
+    PatternLayout * pLayout1 = new PatternLayout();
+    pLayout1->setConversionPattern("%d : %p %c %x : %m %n");
+
+    OstreamAppender * pOstreamAppender = new OstreamAppender("ostreamappender",&cout);
+    pOstreamAppender->setLayout(pLayout);
+
+
+    Appender* rfapp = new RollingFileAppender("rfapp","rfappender.txt",2*1024,2);
+    rfapp->setLayout(pLayout1);
+
+    root.setAppender(rfapp);
+    root.setAppender(pOstreamAppender);
+    root.setPriority(Priority::DEBUG);
+    
+    return root;
+}
+
+void MyLoger::warn(string msg,Category & root){
+    root.warn(msg);
+}
+
+void MyLoger::error(string msg,Category & root){
+    root.error(msg);
+}
+
+void MyLoger::info(string msg,Category & root){
+    root.info(msg);
+}
+
+void MyLoger::debug(string msg,Category & root){
+    root.debug(msg);
+}
+        
+#endif

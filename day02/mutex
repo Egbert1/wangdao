@@ -1,0 +1,64 @@
+#ifndef __MUTEXCONDI_H__
+#define __MUTEXCONDI_H__
+
+#include <iostream>
+#include <pthread.h>
+using std::cout;
+using std::endl;
+using std::cin;
+
+
+
+class MutexLock{
+public:
+    MutexLock(){
+        pthread_mutex_init(&mutex,NULL);
+    }
+
+    ~MutexLock(){
+        pthread_mutex_destroy(&mutex);
+    }
+
+    void lock(){
+        pthread_mutex_lock(&mutex);
+    }
+
+    void unlock(){
+        pthread_mutex_unlock(&mutex);
+    }
+
+private:
+    pthread_mutex_t mutex;
+};
+
+class Condition{
+public:
+    Condition(){
+        pthread_mutex_init(&mutex,NULL);
+        pthread_cond_init(&cond,NULL);
+    }
+
+    ~Condition(){
+        pthread_cond_destroy(&cond);
+        pthread_mutex_destroy(&mutex);
+    }
+
+    void wait(){
+        pthread_cond_wait(&cond,&mutex);
+    }
+
+    void notify(){
+        pthread_cond_signal(&cond);
+    }
+
+    void notifyall(){
+        pthread_cond_broadcast(&cond);
+    }
+
+private:
+    pthread_cond_t cond;
+    pthread_mutex_t mutex;
+};
+
+#endif
+

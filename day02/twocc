@@ -1,0 +1,38 @@
+#include <iostream>
+#include "MutexCondi.h"
+
+using std::cout;
+using std::endl;
+using std::cin;
+
+#define N 10000000
+
+int sum = 0;
+MutexLock ml;
+Condition cd;
+void *sumValue(void* n){
+    for(int i = 0;i<N;i++){
+        ml.lock();
+        sum += 1;
+        ml.unlock();
+    }
+    cout << "pthread : Condition notify();" << endl;
+    cd.notify();
+}
+int main()
+{
+    pthread_t phid=0;
+    pthread_create(&phid,NULL,sumValue,NULL);
+    cout << "Condition wait();" << endl;
+    cd.wait(); 
+    for(int i = 0;i<N;i++){
+        ml.lock();
+        /* ml.lock(); */
+        sum += 1;
+        ml.unlock();
+    }
+    pthread_join(phid,NULL);
+    cout << " sum = " << sum << endl;
+    return 0;
+}
+

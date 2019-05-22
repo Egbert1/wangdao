@@ -1,0 +1,22 @@
+#include "MyLoger.h"
+
+using namespace std;
+
+int main()
+{
+    MyLoger* myloger = MyLoger::getInstance();
+    Category & root = myloger->logInit();
+    string msg;
+    stringstream ss;
+    GET_FNAME_LINE(ss,"hello");
+    msg = ss.str();
+    
+    myloger->warn(msg,root);
+    myloger->info(msg,root);
+    myloger->debug(msg,root);
+    myloger->error(msg,root);
+    myloger->destroy();
+    myloger->MyLogerDestroy();
+    return 0;
+}
+
